@@ -81,11 +81,11 @@
 
 (defvar cheater-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c t")   'cheater-title)
-    (define-key map (kbd "C-c s")   'cheater-subtitle)
-    (define-key map (kbd "C-c i")   'cheater-italic)
-    (define-key map (kbd "C-c b")   'cheater-bold)
-    (define-key map (kbd "C-c u")   'cheater-underline)
+    (define-key map (kbd "C-c f t")   'cheater-title)
+    (define-key map (kbd "C-c f s")   'cheater-subtitle)
+    (define-key map (kbd "C-c f i")   'cheater-italic)
+    (define-key map (kbd "C-c f b")   'cheater-bold)
+    (define-key map (kbd "C-c f u")   'cheater-underline)
     (define-key map (kbd "C-c c f")   'cheater-apply-foreground-color)
     (define-key map (kbd "C-c c b")   'cheater-apply-background-color)
     map)
