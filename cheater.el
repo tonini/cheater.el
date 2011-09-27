@@ -198,6 +198,6 @@
 (cheater-init-ansi-code-hash)
 
 ;;;###autoload
-;; (add-to-list 'auto-mode-alist '("\\.cheat$" . cheater-mode))
+(add-to-list 'auto-mode-alist '("\\.cheat$" . cheater-mode))
 
 (provide 'cheater)
