@@ -29,10 +29,12 @@
 ;; Boston, MA 02110-1301, USA.
 
 (defvar cheater--cheat-sheets-directory
-  (concat (file-name-directory (or load-file-name buffer-file-name)) "cheat-sheets"))
+  (concat (file-name-directory (or load-file-name buffer-file-name)) "cheat-sheets")
+  "absolute path to the cheat-sheets directory.")
 
 (defvar cheater--cheat-sheets-files
-  (directory-files cheater--cheat-sheets-directory nil "\\.cheat$"))
+  (directory-files cheater--cheat-sheets-directory nil "\\.cheat$")
+  "all *.cheat files in the cheat sheets directory.")
 
 (defvar cheater--ansi-code-hash (make-hash-table :test 'equal)
   "hash table with the ansi color and effect escape sequences.")
@@ -40,24 +42,14 @@
 (defvar cheater--color-list '("black" "red" "green" "yellow" "blue" "magenta" "cyan" "white")
   "list of all available ansi colors.")
 
-(defun cheater ()
-  "Look up for Cheat Sheets"
-  (interactive)
-  (let ((completing-read-func (if (null ido-mode)
-                                  'completing-read
-                                'ido-completing-read)))
-    (setq cheat-sheet
-          (funcall completing-read-func
-                   "cheat sheet: "
-                   (cheater-remove-file-extension cheater--cheat-sheets-files)
-                   nil
-                   t)))
-  (let ((cheater-buffer-name (format "*cheater %s*" cheat-sheet)))
-    (unless (get-buffer cheater-buffer-name)
-      (let ((cheater-buffer (get-buffer-create cheater-buffer-name)))
-        (display-buffer cheater-buffer)
-        (cheater-setup-cheat-sheet-buffer cheater-buffer cheat-sheet)))
-    (display-buffer cheater-buffer-name)))
+(defun cheater-cheat-sheet-filepath (name)
+  "returns the absolute cheat sheet file path for NAME."
+  (concat cheater--cheat-sheets-directory "/" name ".cheat"))
+
+(defun cheater-remove-file-extension (filenames)
+  "remove the '.cheat' file extension for each file in FILENAMES"
+  (mapcar (lambda (filename)
+            (first (split-string filename ".cheat"))) filenames))
 
 (defun cheater-setup-cheat-sheet-buffer (buffer cheat-sheet)
   "setup BUFFER to load the cheat-sheet."
@@ -68,38 +60,6 @@
     (goto-char (point-min))
     (setq buffer-read-only t)))
 
-(defun cheater-mode ()
-  "Major mode for editing Cheat Sheets."
-  (interactive)
-  (use-local-map cheater-mode-map)
-  (setq mode-name "Cheater")
-  (setq major-mode 'cheater-mode)
-
-  (if (fboundp 'run-mode-hooks)
-      (run-mode-hooks 'cheater-mode-hook)
-    (run-hooks 'cheater-mode-hook)))
-
-(defvar cheater-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c f t")   'cheater-title)
-    (define-key map (kbd "C-c f s")   'cheater-subtitle)
-    (define-key map (kbd "C-c f i")   'cheater-italic)
-    (define-key map (kbd "C-c f b")   'cheater-bold)
-    (define-key map (kbd "C-c f u")   'cheater-underline)
-    (define-key map (kbd "C-c c f")   'cheater-apply-foreground-color)
-    (define-key map (kbd "C-c c b")   'cheater-apply-background-color)
-    map)
-  "Keymap used in cheater-mode.")
-
-
-(defun cheater-cheat-sheet-filepath (name)
-  "returns the absolute cheat sheet file path for NAME."
-  (concat cheater--cheat-sheets-directory "/" name ".cheat"))
-
-(defun cheater-remove-file-extension (filenames)
-  "remove the '.cheat' file extension for each file in FILENAMES"
-  (mapcar (lambda (filename)
-            (first (split-string filename ".cheat"))) filenames))
 
 (defun cheater-title ()
   "format region with red and bold ansi escape sequence."
@@ -145,6 +105,7 @@
                                         cheater--ansi-code-hash)))
 
 (defun cheater-color-autocompleter (color-level)
+  "ansi color autocompleter."
   (let ((completing-read-func (if (null ido-mode)
                                   'completing-read
                                 'ido-completing-read)))
@@ -156,6 +117,7 @@
                    t))))
 
 (defun cheater-apply-ansi-escape-to-region (ansi-code)
+  "apply the ANSI-CODE sequences to the region."
   (save-excursion
     (goto-char (region-beginning)) (insert ansi-code)
     (goto-char (region-end)) (insert (cond
@@ -165,6 +127,7 @@
   (ansi-color-apply-on-region (region-beginning) (+ (string-bytes ansi-code) (region-end))))
 
 (defun cheater-init-ansi-code-hash ()
+  "initialize the hash for the ansi escape sequences."
   ;; foreground-color-sequences
   (puthash "blackf" "[30m" cheater--ansi-code-hash)
   (puthash "redf" "[31m" cheater--ansi-code-hash)
@@ -190,5 +153,52 @@
   (puthash "italic" "[3m" cheater--ansi-code-hash)
   (puthash "reset" "[0m" cheater--ansi-code-hash))
 
+(defvar cheater-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c f t")   'cheater-title)
+    (define-key map (kbd "C-c f s")   'cheater-subtitle)
+    (define-key map (kbd "C-c f i")   'cheater-italic)
+    (define-key map (kbd "C-c f b")   'cheater-bold)
+    (define-key map (kbd "C-c f u")   'cheater-underline)
+    (define-key map (kbd "C-c c f")   'cheater-apply-foreground-color)
+    (define-key map (kbd "C-c c b")   'cheater-apply-background-color)
+    map)
+  "Keymap used in cheater-mode.")
+
+;;;###autoload
+(defun cheater-mode ()
+  "Major mode for editing Cheat Sheets."
+  (interactive)
+  (use-local-map cheater-mode-map)
+  (setq mode-name "Cheater")
+  (setq major-mode 'cheater-mode)
+
+  (if (fboundp 'run-mode-hooks)
+      (run-mode-hooks 'cheater-mode-hook)
+    (run-hooks 'cheater-mode-hook)))
+
+(defun cheater ()
+  "Look up for Cheat Sheets"
+  (interactive)
+  (let ((completing-read-func (if (null ido-mode)
+                                  'completing-read
+                                'ido-completing-read)))
+    (setq cheat-sheet
+          (funcall completing-read-func
+                   "cheat sheet: "
+                   (cheater-remove-file-extension cheater--cheat-sheets-files)
+                   nil
+                   t)))
+  (let ((cheater-buffer-name (format "*cheater %s*" cheat-sheet)))
+    (unless (get-buffer cheater-buffer-name)
+      (let ((cheater-buffer (get-buffer-create cheater-buffer-name)))
+        (display-buffer cheater-buffer)
+        (cheater-setup-cheat-sheet-buffer cheater-buffer cheat-sheet)))
+    (display-buffer cheater-buffer-name)))
+
 (cheater-init-ansi-code-hash)
+
+;;;###autoload
+;; (add-to-list 'auto-mode-alist '("\\.cheat$" . cheater-mode))
+
 (provide 'cheater)
