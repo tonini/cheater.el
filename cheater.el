@@ -34,6 +34,12 @@
 (defvar cheater--cheat-sheets-files
   (directory-files cheater--cheat-sheets-directory nil "\\.cheat$"))
 
+(defvar cheater--ansi-code-hash (make-hash-table :test 'equal)
+  "hash table with the ansi color and effect escape sequences.")
+
+(defvar cheater--color-list '("black" "red" "green" "yellow" "blue" "magenta" "cyan" "white")
+  "list of all available ansi colors.")
+
 (defun cheater ()
   "Look up for Cheat Sheets"
   (interactive)
@@ -62,6 +68,30 @@
     (goto-char (point-min))
     (setq buffer-read-only t)))
 
+(defun cheater-mode ()
+  "Major mode for editing Cheat Sheets."
+  (interactive)
+  (use-local-map cheater-mode-map)
+  (setq mode-name "Cheater")
+  (setq major-mode 'cheater-mode)
+
+  (if (fboundp 'run-mode-hooks)
+      (run-mode-hooks 'cheater-mode-hook)
+    (run-hooks 'cheater-mode-hook)))
+
+(defvar cheater-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c t")   'cheater-title)
+    (define-key map (kbd "C-c s")   'cheater-subtitle)
+    (define-key map (kbd "C-c i")   'cheater-italic)
+    (define-key map (kbd "C-c b")   'cheater-bold)
+    (define-key map (kbd "C-c u")   'cheater-underline)
+    (define-key map (kbd "C-c c f")   'cheater-apply-foreground-color)
+    (define-key map (kbd "C-c c b")   'cheater-apply-background-color)
+    map)
+  "Keymap used in cheater-mode.")
+
+
 (defun cheater-cheat-sheet-filepath (name)
   "returns the absolute cheat sheet file path for NAME."
   (concat cheater--cheat-sheets-directory "/" name ".cheat"))
@@ -69,6 +99,96 @@
 (defun cheater-remove-file-extension (filenames)
   "remove the '.cheat' file extension for each file in FILENAMES"
   (mapcar (lambda (filename)
-          (first (split-string filename ".cheat"))) filenames))
+            (first (split-string filename ".cheat"))) filenames))
 
+(defun cheater-title ()
+  "format region with red and bold ansi escape sequence."
+  (interactive)
+  (cheater-apply-ansi-escape-to-region (concat
+                                        (gethash "red" cheater--ansi-code-hash)
+                                        (gethash "bold" cheater--ansi-code-hash))))
+
+(defun cheater-subtitle ()
+  "format region with bold and underline ansi escape sequence."
+  (interactive)
+  (cheater-apply-ansi-escape-to-region (concat
+                                        (gethash "bold" cheater--ansi-code-hash)
+                                        (gethash "underline" cheater--ansi-code-hash))))
+
+(defun cheater-underline ()
+  "format region with underline ansi escape sequence."
+  (interactive)
+  (cheater-apply-ansi-escape-to-region (gethash "underline" cheater--ansi-code-hash)))
+
+(defun cheater-bold ()
+  "format region with bold ansi escape sequence."
+  (interactive)
+  (cheater-apply-ansi-escape-to-region (gethash "bold" cheater--ansi-code-hash)))
+
+(defun cheater-italic ()
+  "format region with italic ansi escape sequence."
+  (interactive)
+  (cheater-apply-ansi-escape-to-region (gethash "italic" cheater--ansi-code-hash)))
+
+(defun cheater-apply-foreground-color ()
+  "format region with an ansi escape sequence foreground color."
+  (interactive)
+  (cheater-apply-ansi-escape-to-region (gethash
+                                        (concat (cheater-color-autocompleter "Foreground Color: ") "f")
+                                        cheater--ansi-code-hash)))
+
+(defun cheater-apply-background-color ()
+  "format region with an ansi escape sequence background color."
+  (interactive)
+  (cheater-apply-ansi-escape-to-region (gethash
+                                        (concat (cheater-color-autocompleter "Background Color: ") "b")
+                                        cheater--ansi-code-hash)))
+
+(defun cheater-color-autocompleter (color-level)
+  (let ((completing-read-func (if (null ido-mode)
+                                  'completing-read
+                                'ido-completing-read)))
+    (setq color
+          (funcall completing-read-func
+                   color-level
+                   cheater--color-list
+                   nil
+                   t))))
+
+(defun cheater-apply-ansi-escape-to-region (ansi-code)
+  (save-excursion
+    (goto-char (region-beginning)) (insert ansi-code)
+    (goto-char (region-end)) (insert (cond
+                                      ((<= (length ansi-code) 5) (gethash "reset" cheater--ansi-code-hash))
+                                      ((>= (length ansi-code) 8) (concat (gethash "reset" cheater--ansi-code-hash)
+                                                                         (gethash "reset" cheater--ansi-code-hash))))))
+  (ansi-color-apply-on-region (region-beginning) (+ (string-bytes ansi-code) (region-end))))
+
+(defun cheater-init-ansi-code-hash ()
+  ;; foreground-color-sequences
+  (puthash "blackf" "[30m" cheater--ansi-code-hash)
+  (puthash "redf" "[31m" cheater--ansi-code-hash)
+  (puthash "greenf" "[32m" cheater--ansi-code-hash)
+  (puthash "yellowf" "[33m" cheater--ansi-code-hash)
+  (puthash "bluef" "[34m" cheater--ansi-code-hash)
+  (puthash "magentaf" "[35m" cheater--ansi-code-hash)
+  (puthash "cyanf" "[36m" cheater--ansi-code-hash)
+  (puthash "whitef" "[37m" cheater--ansi-code-hash)
+  ;; background-color-sequences
+  (puthash "blackb" "[40m" cheater--ansi-code-hash)
+  (puthash "redb" "[41m" cheater--ansi-code-hash)
+  (puthash "greenb" "[42m" cheater--ansi-code-hash)
+  (puthash "yellowb" "[43m" cheater--ansi-code-hash)
+  (puthash "blueb" "[44m" cheater--ansi-code-hash)
+  (puthash "magentab" "[45m" cheater--ansi-code-hash)
+  (puthash "cyanb" "[46m" cheater--ansi-code-hash)
+  (puthash "whiteb" "[47m" cheater--ansi-code-hash)
+  ;; effects-sequences
+  (puthash "bold" "[1m" cheater--ansi-code-hash)
+  (puthash "underline" "[4m" cheater--ansi-code-hash)
+  (puthash "italic" "[3m" cheater--ansi-code-hash)
+  (puthash "italic" "[3m" cheater--ansi-code-hash)
+  (puthash "reset" "[0m" cheater--ansi-code-hash))
+
+(cheater-init-ansi-code-hash)
 (provide 'cheater)
