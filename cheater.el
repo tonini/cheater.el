@@ -123,8 +123,7 @@
     (goto-char (region-end)) (insert (cond
                                       ((<= (length ansi-code) 5) (gethash "reset" cheater--ansi-code-hash))
                                       ((>= (length ansi-code) 8) (concat (gethash "reset" cheater--ansi-code-hash)
-                                                                         (gethash "reset" cheater--ansi-code-hash))))))
-  (ansi-color-apply-on-region (region-beginning) (+ (string-bytes ansi-code) (region-end))))
+                                                                         (gethash "reset" cheater--ansi-code-hash)))))))
 
 (defun cheater-init-ansi-code-hash ()
   "initialize the hash for the ansi escape sequences."
