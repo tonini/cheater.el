@@ -65,6 +65,13 @@
                                         (gethash "bold" cheater--ansi-code-hash)
                                         (gethash "underline" cheater--ansi-code-hash))))
 
+(defun cheater-code ()
+  "format region with black background and white foreground color ansi escape sequence."
+  (interactive)
+  (cheater-apply-ansi-escape-to-region (concat
+                                        (gethash "whitef" cheater--ansi-code-hash)
+                                        (gethash "blackb" cheater--ansi-code-hash))))
+
 (defun cheater-underline ()
   "format region with underline ansi escape sequence."
   (interactive)
