@@ -116,13 +116,19 @@
 (defun cheater-apply-ansi-escape-to-region (ansi-code)
   "apply the ANSI-CODE sequences to the region."
   (save-excursion
-    (goto-char (region-beginning))
-    (insert ansi-code)
-    (goto-char (+ (region-end) (length ansi-code)))
+    (cond
+     ((< (region-beginning) (region-end)) (setq start-point (region-beginning)
+                                                end-point (region-end)))
+     ((> (region-beginning) (region-end)) (setq start-point (region-end)
+                                                end-point (region-beginning))))
+    (goto-char end-point)
     (insert (cond
              ((<= (length ansi-code) 5) (gethash "reset" cheater--ansi-code-hash))
              ((>= (length ansi-code) 8) (concat (gethash "reset" cheater--ansi-code-hash)
-                                                (gethash "reset" cheater--ansi-code-hash)))))))
+                                                (gethash "reset" cheater--ansi-code-hash)))))
+    ;; (insert (gethash "reset" cheater--ansi-code-hash))
+    (goto-char start-point)
+    (insert ansi-code)))
 
 (defun cheater-init-ansi-code-hash ()
   "initialize the hash for the ansi escape sequences."
