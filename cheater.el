@@ -65,7 +65,7 @@
   "format region with red and bold ansi escape sequence."
   (interactive)
   (cheater-apply-ansi-escape-to-region (concat
-                                        (gethash "red" cheater--ansi-code-hash)
+                                        (gethash "redf" cheater--ansi-code-hash)
                                         (gethash "bold" cheater--ansi-code-hash))))
 
 (defun cheater-subtitle ()
