@@ -11,18 +11,3 @@
 [1mfg[0m                      brings the most recent job to foreground
 [1mfg[0m [3mn[0m                    brings job [3mn[0m to the foreground
 
-[1m[4mFile Permissions[0m[0m
-
-[1mchmod[0m [3moctal file[0m        change the permissions of [3mfile[0m
-                        to octal, which can be found separately for user,
-                        group, and world by adding:
-
-                        * 4 - read (r)
-                        * 2 - write (w)
-                        * 1 - execute (x)
-
-Examples:
-
-[1mchmod 777[0m               read, write, execute for all
-[1mchmod 755[0m               rwx for owner, rx for group and world
-                        For more options, see [1mman chmod[0m.

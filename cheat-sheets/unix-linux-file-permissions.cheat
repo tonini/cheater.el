@@ -1,0 +1,17 @@
+[31m[1mUnix/Linux File Permissions[0m[0m
+
+[1msource:[0m http://files.fosswire.com/2007/08/fwunixref.pdf
+
+[1mchmod[0m [3moctal file[0m        change the permissions of [3mfile[0m
+                        to octal, which can be found separately for user,
+                        group, and world by adding:
+
+                        * 4 - read (r)
+                        * 2 - write (w)
+                        * 1 - execute (x)
+
+Examples:
+
+[1mchmod 777[0m               read, write, execute for all
+[1mchmod 755[0m               rwx for owner, rx for group and world
+                        For more options, see [1mman chmod[0m.
