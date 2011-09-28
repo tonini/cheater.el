@@ -1,0 +1,28 @@
+[31m[1mUnix/Linux Process Management[0m[0m
+
+[1msource:[0m http://files.fosswire.com/2007/08/fwunixref.pdf
+
+[1mps[0m                      display your currently active processes
+[1mtop[0m                     display all running processes
+[1mkill[0m [3mpid[0m                kill process id [3mpid[0m
+[1mkillall[0m [3mproc[0m            kill all processes named [3mproc[0m *
+[1mbg[0m                      lists stopped or background jobs; resume a
+                        stopped job in the background
+[1mfg[0m                      brings the most recent job to foreground
+[1mfg[0m [3mn[0m                    brings job [3mn[0m to the foreground
+
+[1m[4mFile Permissions[0m[0m
+
+[1mchmod[0m [3moctal file[0m        change the permissions of [3mfile[0m
+                        to octal, which can be found separately for user,
+                        group, and world by adding:
+
+                        * 4 - read (r)
+                        * 2 - write (w)
+                        * 1 - execute (x)
+
+Examples:
+
+[1mchmod 777[0m               read, write, execute for all
+[1mchmod 755[0m               rwx for owner, rx for group and world
+                        For more options, see [1mman chmod[0m.

@@ -1,0 +1,27 @@
+[31m[1mUnix/Linux File Commands[0m[0m
+
+[1msource:[0m http://files.fosswire.com/2007/08/fwunixref.pdf
+
+[1mls    [0m                  directory listing
+[1mls -al    [0m              formatted listing with hidden files
+[1mcd dir    [0m              change directory to [3mdir[0m
+[1mcd    [0m                  change to home
+[1mpwd    [0m                 show current directory
+[1mmkdir[0m[3m dir[0m               create a directory [3mdir[0m
+[1mrm[0m[3m dir[0m                  delete [3mfile[0m
+[1mrm -r [0m[3mdir    [0m           delete directory [3mdir[0m
+[1mrm -f [0m[3mfile[0m              force remove [3mfile[0m
+[1mrm -rf[0m [3mdir [0m             force remove directory [3mdir [0m*
+[1mcp [0m[3mfile1 file2[0m          copy [3mfile1[0m to [3mfile2[0m
+[1mcp -r [0m[3mdir1[0m dir2         copy [3mdir1[0m to [3mdir2[0m; create [3mdir2[0m if it doesn't exist
+[1mmv [0m[3mfile1 file2[0m          rename or move [3mfile1[0m to [3mfile2[0m
+                        if [3mfile2[0m is an existing directory, moves [3mfile1[0m into
+                        directory [3mfile2[0m
+[1mln -s[0m [3mfile link[0m         create symbolic link [3mlink[0m to [3mfile[0m
+[1mtouch[0m [3mfile[0m              create or update [3mfile[0m
+[1mcat [0m> [3mfile[0m              places standard input into [3mfile[0m
+[1mmore[0m [3mfile[0m               output the contents of [3mfile[0m
+[1mhead[0m [3mfile[0m               output the first 10 lines of [3mfile[0m
+[1mtail[0m [3mfile[0m               output the last 10 lines of [3mfile[0m
+[1mtail  -f[0m [3mfile[0m           output the contents of [3mfile[0m as it
+                        grows, starting with the last 10 lines

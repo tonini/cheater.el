@@ -1,0 +1,19 @@
+[31m[1mUnix/Linux System Info[0m[0m
+
+[1msource:[0m http://files.fosswire.com/2007/08/fwunixref.pdf
+
+[1mdate[0m                    show the current date and time
+[1mcal[0m                     show this month's calendar
+[1muptime[0m                  show current uptime
+[1mw[0m                       display who is online
+[1mwhoami[0m                  who you are logged in as
+[1mfinger[0m [3muser[0m             display information about [3muser[0m
+[1muname -a[0m                show kernel information
+[1mcat /proc/cpuinfo[0m       cpu information
+[1mcat /proc/meminfo[0m       memory information
+[1mman[0m [1m[3mcommand[0m[0m             show the manual for [3mcommand[0m
+[1mdf[0m                      show disk usage
+[1mdu[0m                      show directory space usage
+[1mfree[0m                    show memory and swap usage
+[1mwhereis[0m [3mapp[0m             show possible locations of [3mapp[0m
+[1mwhich[0m [3mapp[0m               show which [3mapp[0m will be run by default
