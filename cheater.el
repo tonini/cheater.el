@@ -51,16 +51,6 @@
   (mapcar (lambda (filename)
             (first (split-string filename ".cheat"))) filenames))
 
-(defun cheater-setup-cheat-sheet-buffer (buffer cheat-sheet)
-  "setup BUFFER to load the cheat-sheet."
-  (with-current-buffer buffer
-    (erase-buffer)
-    (insert-file-contents (cheater-cheat-sheet-filepath cheat-sheet))
-    (ansi-color-apply-on-region (point-min) (point-max))
-    (goto-char (point-min))
-    (setq buffer-read-only t)))
-
-
 (defun cheater-title ()
   "format region with red and bold ansi escape sequence."
   (interactive)
@@ -119,11 +109,13 @@
 (defun cheater-apply-ansi-escape-to-region (ansi-code)
   "apply the ANSI-CODE sequences to the region."
   (save-excursion
-    (goto-char (region-beginning)) (insert ansi-code)
-    (goto-char (region-end)) (insert (cond
-                                      ((<= (length ansi-code) 5) (gethash "reset" cheater--ansi-code-hash))
-                                      ((>= (length ansi-code) 8) (concat (gethash "reset" cheater--ansi-code-hash)
-                                                                         (gethash "reset" cheater--ansi-code-hash)))))))
+    (goto-char (region-beginning))
+    (insert ansi-code)
+    (goto-char (+ (region-end) (length ansi-code)))
+    (insert (cond
+             ((<= (length ansi-code) 5) (gethash "reset" cheater--ansi-code-hash))
+             ((>= (length ansi-code) 8) (concat (gethash "reset" cheater--ansi-code-hash)
+                                                (gethash "reset" cheater--ansi-code-hash)))))))
 
 (defun cheater-init-ansi-code-hash ()
   "initialize the hash for the ansi escape sequences."
@@ -194,6 +186,34 @@
         (display-buffer cheater-buffer)
         (cheater-setup-cheat-sheet-buffer cheater-buffer cheat-sheet)))
     (display-buffer cheater-buffer-name)))
+
+(defun cheater-setup-cheat-sheet-buffer (buffer cheat-sheet)
+  "setup BUFFER to load the cheat-sheet."
+  (with-current-buffer buffer
+    (erase-buffer)
+    (insert-file-contents (cheater-cheat-sheet-filepath cheat-sheet))
+    (ansi-color-apply-on-region (point-min) (point-max))
+    (goto-char (point-min))
+    (setq buffer-read-only t)))
+
+(defun cheater-cheat-sheet-preview-mode ()
+  "create a preview mode for the current buffer in which all ansi escape sequences will be evaluted."
+  (interactive)
+  (let ((cheater-buffer-preview-name "*cheater preview mode*"))
+    (unless (get-buffer cheater-buffer-preview-name)
+      (let ((cheater-preview-buffer (get-buffer-create cheater-buffer-preview-name)))
+        (cheater-setup-cheat-sheet-preview-buffer cheater-preview-buffer)))
+    (cheater-setup-cheat-sheet-preview-buffer (get-buffer cheater-buffer-preview-name))))
+
+(defun cheater-setup-cheat-sheet-preview-buffer (cheater-preview-buffer)
+  "setup CHEAT-PREVIEW-BUFFER for preview mode."
+  (let ((current-buffer-content (buffer-string))
+        (current-point (point)))
+    (display-buffer cheater-preview-buffer)
+    (with-current-buffer cheater-preview-buffer
+      (erase-buffer)
+      (insert current-buffer-content)
+      (ansi-color-apply-on-region (point-min) (point-max)))))
 
 (cheater-init-ansi-code-hash)
 
